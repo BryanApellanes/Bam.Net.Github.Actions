@@ -2,24 +2,45 @@
 using System.Collections.Generic;
 using Bam.Net;
 using Bam.Net.CommandLine;
+using Bam.Net.CoreServices.AccessControl;
+using Bam.Net.Encryption;
 using Bam.Net.Web;
 
 namespace Bam.Net.Github.Actions
 {
     public class GithubActionsClient
     {
+        public GithubActionsClient() : this(new VaultAuthorizationHeaderProvider(Vault.System))
+        {
+        }
+
+        public GithubActionsClient(Vault vault) : this(new VaultAuthorizationHeaderProvider(vault))
+        {
+        }
+
+        public GithubActionsClient(IAuthorizationHeaderProvider authorizationHeaderProvider)
+        {
+            AuthorizationHeaderProvider = authorizationHeaderProvider;
+        }
+
         public virtual IEnumerable<GithubArtifact> GetArtifacts(string repoOwnerUserName, string repoName)
         {
             GithubArtifactsGetResponse response = Http.GetJson<GithubArtifactsGetResponse>(GetArtifactsUri(repoOwnerUserName, repoName).ToString(), GetHeaders(true));
             return response.Artifacts;
         }
 
+        public IAuthorizationHeaderProvider AuthorizationHeaderProvider
+        {
+            get;
+            private set;
+        }
+        
         protected Uri GetArtifactsUri(string repoOwnerUserName, string repoName)
         {
             return new Uri($"{GetGithubApiDomain()}{GetArtifactsPath(repoOwnerUserName, repoName)}");
         }
         
-        protected string GetGithubApiDomain()
+        protected virtual string GetGithubApiDomain()
         {
             return "https://api.github.com";
         }
@@ -54,7 +75,8 @@ namespace Bam.Net.Github.Actions
             Dictionary<string, string> result = new Dictionary<string, string>();
             if (includeAuthorizationHeader)
             {
-                result.Add("Authorization", GetGithubToken());
+                AuthorizationHeader header = AuthorizationHeaderProvider.GetAuthorizationHeader();
+                header.Add(result);
             }
             return result;
         }
