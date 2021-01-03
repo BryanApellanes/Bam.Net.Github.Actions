@@ -10,7 +10,7 @@ namespace Bam.Net.Github.Actions
 {
     public class GithubActionsClient
     {
-        public GithubActionsClient() : this(new VaultAuthorizationHeaderProvider(Vault.System))
+        public GithubActionsClient() : this(new GithubVaultAuthorizationHeaderProvider())
         {
         }
 
