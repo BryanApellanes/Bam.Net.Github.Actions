@@ -12,5 +12,10 @@ namespace Bam.Net.Github.Actions
             TokenType = TokenTypes.Token;
             Vault = Vault.Profile;
         }
+
+        public GithubVaultAuthorizationHeaderProvider(Vault vault) : this()
+        {
+            Vault = vault;
+        }
     }
 }
