@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
+using Bam.Net.Caching;
+using Bam.Net.CoreServices.AccessControl;
 using Bam.Net.Web;
 using Newtonsoft.Json;
 
 namespace Bam.Net.Github.Actions
 {
     [Serializable]
-    public class GithubArtifact
+    public class GithubArtifact : IMemorySize
     {
         [JsonProperty("id")]
         public uint Id { get; set; }
@@ -38,6 +40,13 @@ namespace Bam.Net.Github.Actions
         [JsonProperty("expires_at")]
         public DateTime ExpiresAt { get; set; }
 
+        [JsonIgnore]
+        public IAuthorizationHeaderProvider AuthorizationHeaderProvider
+        {
+            get;
+            set;
+        }
+        
         public FileInfo DownloadTo(FileInfo fileInfo)
         {
             return DownloadTo(fileInfo.FullName);
@@ -45,9 +54,14 @@ namespace Bam.Net.Github.Actions
 
         public FileInfo DownloadTo(string filePath)
         {
-            byte[] fileData = Http.GetData(ArchiveDownloadUrl);
+            byte[] fileData = Http.GetData(ArchiveDownloadUrl, AuthorizationHeaderProvider?.GetAuthorizationHeader().ToDictionary());
             File.WriteAllBytes(filePath, fileData);
             return new FileInfo(filePath);
+        }
+
+        public int MemorySize()
+        {
+            return this.ToBinaryBytes().Length;
         }
     }
 }

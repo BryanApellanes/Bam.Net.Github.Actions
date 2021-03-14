@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using Bam.Net;
+using Bam.Net.Caching;
 using Bam.Net.CommandLine;
 using Bam.Net.CoreServices.AccessControl;
 using Bam.Net.Encryption;
@@ -26,6 +28,7 @@ namespace Bam.Net.Github.Actions
         public GithubActionsClient(IAuthorizationHeaderProvider authorizationHeaderProvider)
         {
             AuthorizationHeaderProvider = authorizationHeaderProvider;
+            Cache = Cache<GithubArtifact>.Get();
         }
 
         public virtual IEnumerable<GithubArtifact> GetArtifacts(string repoOwnerUserName = null, string repoName = null)
@@ -33,18 +36,30 @@ namespace Bam.Net.Github.Actions
             repoOwnerUserName ??= RepoOwnerUserName;
             repoName ??= RepoName;
             GithubArtifactsGetResponse response = Http.GetJson<GithubArtifactsGetResponse>(GetArtifactsUri(repoOwnerUserName, repoName).ToString(), GetHeaders(true));
+            foreach (GithubArtifact artifact in response.Artifacts)
+            {
+                artifact.AuthorizationHeaderProvider = AuthorizationHeaderProvider;
+            }
             return response.Artifacts;
         }
 
         public virtual GithubArtifact GetArtifact(uint artifactId, string repoOwnerUserName = null, string repoName = null)
         {
-            return Http.GetJson<GithubArtifact>(GetApiUri(artifactId.ToString(), repoOwnerUserName, repoName).ToString(), GetHeaders(true));
+            GithubArtifact artifact = Http.GetJson<GithubArtifact>(GetApiUri(artifactId.ToString(), repoOwnerUserName, repoName).ToString(), GetHeaders(true));
+            artifact.AuthorizationHeaderProvider = AuthorizationHeaderProvider;
+            return artifact;
         }
 
         public virtual bool DeleteArtifact(uint artifactId, string repoOwnerUserName = null, string repoName = null)
         {
             HttpResponseMessage responseMessage = Http.DeleteAsync(GetApiUri(artifactId.ToString(), repoOwnerUserName, repoName).ToString(), GetHeaders(true)).Result;
             return responseMessage.IsSuccessStatusCode;
+        }
+
+        protected Cache<GithubArtifact> Cache
+        {
+            get;
+            set;
         }
         
         public IAuthorizationHeaderProvider AuthorizationHeaderProvider
