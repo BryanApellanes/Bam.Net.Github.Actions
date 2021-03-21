@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 namespace Bam.Net.Github.Actions
 {
     [Serializable]
-    public class GithubArtifact : IMemorySize
+    public class GithubArtifactInfo : IMemorySize
     {
         [JsonProperty("id")]
         public uint Id { get; set; }

@@ -10,6 +10,6 @@ namespace Bam.Net.Github.Actions
         public int TotalCount { get; set; }
         
         [JsonProperty("artifacts")]
-        public GithubArtifact[] Artifacts { get; set; }
+        public GithubArtifactInfo[] Artifacts { get; set; }
     }
 }

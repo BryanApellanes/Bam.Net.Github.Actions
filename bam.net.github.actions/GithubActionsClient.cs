@@ -28,26 +28,26 @@ namespace Bam.Net.Github.Actions
         public GithubActionsClient(IAuthorizationHeaderProvider authorizationHeaderProvider)
         {
             AuthorizationHeaderProvider = authorizationHeaderProvider;
-            Cache = Cache<GithubArtifact>.Get();
+            Cache = Cache<GithubArtifactInfo>.Get();
         }
 
-        public virtual IEnumerable<GithubArtifact> GetArtifacts(string repoOwnerUserName = null, string repoName = null)
+        public virtual IEnumerable<GithubArtifactInfo> ListArtifactInfos(string repoOwnerUserName = null, string repoName = null)
         {
             repoOwnerUserName ??= RepoOwnerUserName;
             repoName ??= RepoName;
             GithubArtifactsGetResponse response = Http.GetJson<GithubArtifactsGetResponse>(GetArtifactsUri(repoOwnerUserName, repoName).ToString(), GetHeaders(true));
-            foreach (GithubArtifact artifact in response.Artifacts)
+            foreach (GithubArtifactInfo artifact in response.Artifacts)
             {
                 artifact.AuthorizationHeaderProvider = AuthorizationHeaderProvider;
+                yield return artifact;
             }
-            return response.Artifacts;
         }
 
-        public virtual GithubArtifact GetArtifact(uint artifactId, string repoOwnerUserName = null, string repoName = null)
+        public virtual GithubArtifactInfo GetArtifactInfo(uint artifactId, string repoOwnerUserName = null, string repoName = null)
         {
-            GithubArtifact artifact = Http.GetJson<GithubArtifact>(GetApiUri(artifactId.ToString(), repoOwnerUserName, repoName).ToString(), GetHeaders(true));
-            artifact.AuthorizationHeaderProvider = AuthorizationHeaderProvider;
-            return artifact;
+            GithubArtifactInfo artifactInfo = Http.GetJson<GithubArtifactInfo>(GetApiUri(artifactId.ToString(), repoOwnerUserName, repoName).ToString(), GetHeaders(true));
+            artifactInfo.AuthorizationHeaderProvider = AuthorizationHeaderProvider;
+            return artifactInfo;
         }
 
         public virtual bool DeleteArtifact(uint artifactId, string repoOwnerUserName = null, string repoName = null)
@@ -56,7 +56,7 @@ namespace Bam.Net.Github.Actions
             return responseMessage.IsSuccessStatusCode;
         }
 
-        protected Cache<GithubArtifact> Cache
+        protected Cache<GithubArtifactInfo> Cache
         {
             get;
             set;
