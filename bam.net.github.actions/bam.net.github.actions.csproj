@@ -5,6 +5,14 @@
         <RootNamespace>Bam.Net.Github.Actions</RootNamespace>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <OutputPath>\opt\bam\build\bam.net.github.actions\debug</OutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <OutputPath>\opt\bam\build\bam.net.github.action\release</OutputPath>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\..\bam.net.core\bam.net.core.csproj" />
     </ItemGroup>
