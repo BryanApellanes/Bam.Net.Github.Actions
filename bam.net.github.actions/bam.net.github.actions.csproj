@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>\opt\bam\build\bam.net.github.actions\debug</OutputPath>
+      <OutputPath>\opt\bam\build\debug\bam.net.github.actions\</OutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <OutputPath>\opt\bam\build\bam.net.github.action\release</OutputPath>
+      <OutputPath>\opt\bam\build\release\bam.net.github.action\</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>
