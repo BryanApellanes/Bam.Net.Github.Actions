@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using Bam.Net;
@@ -13,21 +14,19 @@ namespace Bam.Net.Github.Actions
 {
     public class GithubActionsClient
     {
-        public GithubActionsClient(string repoOwnerUserName = null, string repoName = null) : this(new GithubVaultAuthorizationHeaderProvider())
+        public GithubActionsClient()
+        {
+        }
+
+        public GithubActionsClient(GithubActionsClientSettings settings) : this(settings.RepoOwnerUserName, settings.RepoName, settings.AuthorizationHeaderProvider)
+        {
+        }
+
+        public GithubActionsClient(string repoOwnerUserName, string repoName, IAuthorizationHeaderProvider authorizationHeaderProvider = null)
         {
             RepoOwnerUserName = repoOwnerUserName;
             RepoName = repoName;
-        }
-
-        public GithubActionsClient(Vault vault,string repoOwnerUserName = null, string repoName = null) : this(new GithubVaultAuthorizationHeaderProvider(vault))
-        {
-            RepoOwnerUserName = repoOwnerUserName;
-            RepoName = repoName;
-        }
-
-        public GithubActionsClient(IAuthorizationHeaderProvider authorizationHeaderProvider)
-        {
-            AuthorizationHeaderProvider = authorizationHeaderProvider;
+            AuthorizationHeaderProvider = authorizationHeaderProvider ?? new EnvironmentVariableAuthorizationHeaderProvider("GithubAccessToken");
             Cache = Cache<GithubArtifactInfo>.Get();
         }
 

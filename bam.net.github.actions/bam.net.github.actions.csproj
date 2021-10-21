@@ -6,12 +6,16 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>\opt\bam\build\debug\bam.net.github.actions\</OutputPath>
+      <OutputPath>C:\opt\bam\build\debug\bam.net.github.actions\</OutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <OutputPath>\opt\bam\build\release\bam.net.github.action\</OutputPath>
     </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Octokit" Version="0.50.0" />
+    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\bam.net.core\bam.net.core.csproj" />

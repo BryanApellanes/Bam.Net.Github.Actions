@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using Bam.Net.Caching;
 using Bam.Net.CoreServices.AccessControl;
 using Bam.Net.Web;
@@ -47,6 +49,11 @@ namespace Bam.Net.Github.Actions
             set;
         }
         
+        public FileInfo Download()
+        {
+            return DownloadTo(new FileInfo($"./{Name}.zip"));
+        }
+
         public FileInfo DownloadTo(FileInfo fileInfo)
         {
             return DownloadTo(fileInfo.FullName);
@@ -54,7 +61,10 @@ namespace Bam.Net.Github.Actions
 
         public FileInfo DownloadTo(string filePath)
         {
-            byte[] fileData = Http.GetData(ArchiveDownloadUrl, AuthorizationHeaderProvider?.GetAuthorizationHeader().ToDictionary());
+            byte[] fileData = Http.GetData($"{ArchiveDownloadUrl}", new System.Collections.Generic.Dictionary<string, string>()
+            {
+                { "Authorization", $"token {AuthorizationHeaderProvider.GetRawValue()}"}
+            });
             File.WriteAllBytes(filePath, fileData);
             return new FileInfo(filePath);
         }
